@@ -1,0 +1,125 @@
+@startuml JabberPoint
+
+' Core classes
+class JabberPoint {
+    +main(String[])
+}
+
+class Presentation {
+    -String showTitle
+    -ArrayList<Slide> showList
+    -int currentSlideNumber
+    +getSlide(int): Slide
+    +nextSlide()
+    +prevSlide()
+}
+
+class Slide {
+    +final static int WIDTH
+    +final static int HEIGHT
+    -String title
+    -Vector<SlideItem> items
+    +append(SlideItem)
+    +draw(Graphics, Rectangle, ImageObserver)
+}
+
+' SlideItems
+abstract class SlideItem {
+    -int level
+    +getLevel(): int
+    +{abstract} getBoundingBox(Graphics, ImageObserver, float, StyleComponent): Rectangle
+    +{abstract} draw(int, int, float, Graphics, StyleComponent, ImageObserver)
+}
+
+class TextItem {
+    -String text
+    +getText(): String
+    +getAttributedString(StyleComponent, float): AttributedString
+}
+
+class BitmapItem {
+    -BufferedImage bufferedImage
+    -String imageName
+    +getName(): String
+}
+
+' Style system
+interface StyleComponent {
+    +getColor(): Color
+    +getFont(float): Font
+    +getIndent(): int
+    +getLeading(): int
+    +createStyles()
+}
+
+class Style {
+    +int indent
+    +Color color
+    +Font font
+    +int fontSize
+    +int leading
+}
+
+abstract class StyleWrapper {
+    -StyleComponent wrappee
+    #getWrappee(): StyleComponent
+}
+
+class ColorStyleDecorator {
+    -Color newColor
+    +getColor(): Color
+}
+
+class FontSizeStyleDecorator {
+    -int newFontSize
+    +getFont(float): Font
+}
+
+' Accessors
+abstract class Accessor {
+    +{abstract} loadFile(Presentation, String)
+    +{abstract} saveFile(Presentation, String)
+}
+
+class XMLAccessor {
+    +loadFile(Presentation, String)
+    +saveFile(Presentation, String)
+}
+
+class DemoPresentation {
+    +loadFile(Presentation, String)
+    +saveFile(Presentation, String)
+}
+
+' UI Components
+class SlideViewerFrame {
+    +setupWindow(SlideViewerComponent, Presentation)
+}
+
+class SlideViewerComponent {
+    -Slide slide
+    -Font labelFont
+    +update(Presentation, Slide)
+    +paintComponent(Graphics)
+}
+
+' Relationships
+JabberPoint --> Presentation : creates
+Presentation "1" *-- "*" Slide
+Slide "1" *-- "*" SlideItem
+SlideItem <|-- TextItem
+SlideItem <|-- BitmapItem
+
+StyleComponent <|.. Style
+StyleComponent <|.. StyleWrapper
+StyleWrapper <|-- ColorStyleDecorator
+StyleWrapper <|-- FontSizeStyleDecorator
+
+Accessor <|-- XMLAccessor
+Accessor <|-- DemoPresentation
+
+SlideViewerFrame *-- SlideViewerComponent
+SlideViewerComponent --> Slide : displays
+SlideViewerComponent --> Presentation : observes
+
+@enduml
