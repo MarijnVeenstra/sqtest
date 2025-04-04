@@ -1,6 +1,6 @@
 package org.nhlstenden.jabberpoint.slide.item;
 
-import org.nhlstenden.jabberpoint.slide.Style;
+import org.nhlstenden.jabberpoint.decorator.StyleComponent;
 
 import java.awt.Rectangle;
 import java.awt.Graphics;
@@ -35,9 +35,9 @@ public abstract class SlideItem {
 
     // Give the bounding box
     public abstract Rectangle getBoundingBox(Graphics g,
-                                             ImageObserver observer, float scale, Style style);
+                                             ImageObserver observer, float scale, StyleComponent style);
 
     // Draw the item
     public abstract void draw(int x, int y, float scale,
-                              Graphics g, Style style, ImageObserver observer);
+                              Graphics g, StyleComponent style, ImageObserver observer);
 }

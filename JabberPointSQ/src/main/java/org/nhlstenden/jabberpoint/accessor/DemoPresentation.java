@@ -31,6 +31,7 @@ class DemoPresentation extends Accessor {
         slide.append(3, "Next slide: PgDn or Enter");
         slide.append(3, "Previous slide: PgUp or up-arrow");
         slide.append(3, "Quit: q or Q");
+        slide.append(5, "Well, this hecking sucks. I am stuck in this demo!");
         presentation.append(slide);
 
         slide = new Slide();

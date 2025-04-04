@@ -1,6 +1,6 @@
 package org.nhlstenden.jabberpoint.slide.item;
 
-import org.nhlstenden.jabberpoint.slide.Style;
+import org.nhlstenden.jabberpoint.decorator.StyleComponent;
 
 import java.awt.Rectangle;
 import java.awt.Graphics;
@@ -53,17 +53,19 @@ public class BitmapItem extends SlideItem {
     }
 
     // give the  bounding box of the image
-    public Rectangle getBoundingBox(Graphics g, ImageObserver observer, float scale, Style myStyle) {
-        return new Rectangle((int) (myStyle.indent * scale), 0,
+    @Override
+    public Rectangle getBoundingBox(Graphics g, ImageObserver observer, float scale, StyleComponent style) {
+        return new Rectangle((int) (style.getIndent() * scale), 0,
                 (int) (bufferedImage.getWidth(observer) * scale),
-                ((int) (myStyle.leading * scale)) +
+                ((int) (style.getLeading() * scale)) +
                         (int) (bufferedImage.getHeight(observer) * scale));
     }
 
     // draw the image
-    public void draw(int x, int y, float scale, Graphics g, Style myStyle, ImageObserver observer) {
-        int width = x + (int) (myStyle.indent * scale);
-        int height = y + (int) (myStyle.leading * scale);
+    @Override
+    public void draw(int x, int y, float scale, Graphics g, StyleComponent style, ImageObserver observer) {
+        int width = x + (int) (style.getIndent() * scale);
+        int height = y + (int) (style.getLeading() * scale);
         g.drawImage(bufferedImage, width, height,(int) (bufferedImage.getWidth(observer)*scale),
                 (int) (bufferedImage.getHeight(observer)*scale), observer);
     }

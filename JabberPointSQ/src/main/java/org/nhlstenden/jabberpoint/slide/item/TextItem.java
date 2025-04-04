@@ -1,7 +1,7 @@
 package org.nhlstenden.jabberpoint.slide.item;
 
 import org.nhlstenden.jabberpoint.slide.Slide;
-import org.nhlstenden.jabberpoint.slide.Style;
+import org.nhlstenden.jabberpoint.decorator.StyleComponent;
 
 import java.awt.Rectangle;
 import java.awt.Graphics;
@@ -51,17 +51,18 @@ public class TextItem extends SlideItem {
     }
 
     // geef de AttributedString voor het item
-    public AttributedString getAttributedString(Style style, float scale) {
+    public AttributedString getAttributedString(StyleComponent style, float scale) {
         AttributedString attrStr = new AttributedString(getText());
         attrStr.addAttribute(TextAttribute.FONT, style.getFont(scale), 0, text.length());
         return attrStr;
-    }
+    } 
 
     // give the bounding box of the item
+    @Override
     public Rectangle getBoundingBox(Graphics g, ImageObserver observer,
-                                    float scale, Style myStyle) {
-        List<TextLayout> layouts = getLayouts(g, myStyle, scale);
-        int xsize = 0, ysize = (int) (myStyle.leading * scale);
+                                    float scale, StyleComponent style) {
+        List<TextLayout> layouts = getLayouts(g, style, scale);
+        int xsize = 0, ysize = (int) (style.getLeading() * scale);
         Iterator<TextLayout> iterator = layouts.iterator();
         while (iterator.hasNext()) {
             TextLayout layout = iterator.next();
@@ -74,20 +75,21 @@ public class TextItem extends SlideItem {
             }
             ysize += layout.getLeading() + layout.getDescent();
         }
-        return new Rectangle((int) (myStyle.indent*scale), 0, xsize, ysize );
+        return new Rectangle((int) (style.getIndent()*scale), 0, xsize, ysize );
     }
 
     // draw the item
+    @Override
     public void draw(int x, int y, float scale, Graphics g,
-                     Style myStyle, ImageObserver o) {
+                     StyleComponent style, ImageObserver o) {
         if (text == null || text.length() == 0) {
             return;
         }
-        List<TextLayout> layouts = getLayouts(g, myStyle, scale);
-        Point pen = new Point(x + (int)(myStyle.indent * scale),
-                y + (int) (myStyle.leading * scale));
+        List<TextLayout> layouts = getLayouts(g, style, scale);
+        Point pen = new Point(x + (int)(style.getIndent() * scale),
+                y + (int) (style.getLeading() * scale));
         Graphics2D g2d = (Graphics2D)g;
-        g2d.setColor(myStyle.color);
+        g2d.setColor(style.getColor());
         Iterator<TextLayout> it = layouts.iterator();
         while (it.hasNext()) {
             TextLayout layout = it.next();
@@ -97,13 +99,13 @@ public class TextItem extends SlideItem {
         }
     }
 
-    private List<TextLayout> getLayouts(Graphics g, Style s, float scale) {
+    private List<TextLayout> getLayouts(Graphics g, StyleComponent s, float scale) {
         List<TextLayout> layouts = new ArrayList<TextLayout>();
         AttributedString attrStr = getAttributedString(s, scale);
         Graphics2D g2d = (Graphics2D) g;
         FontRenderContext frc = g2d.getFontRenderContext();
         LineBreakMeasurer measurer = new LineBreakMeasurer(attrStr.getIterator(), frc);
-        float wrappingWidth = (Slide.WIDTH - s.indent) * scale;
+        float wrappingWidth = (Slide.WIDTH - s.getIndent()) * scale;
         while (measurer.getPosition() < getText().length()) {
             TextLayout layout = measurer.nextLayout(wrappingWidth);
             layouts.add(layout);

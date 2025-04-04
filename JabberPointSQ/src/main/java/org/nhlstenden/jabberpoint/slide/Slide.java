@@ -1,10 +1,13 @@
 package org.nhlstenden.jabberpoint.slide;
 
+import org.nhlstenden.jabberpoint.decorator.Style;
+import org.nhlstenden.jabberpoint.decorator.StyleComponent;
+import org.nhlstenden.jabberpoint.decorator.ColorStyleDecorator;
+import org.nhlstenden.jabberpoint.decorator.FontSizeStyleDecorator;
 import org.nhlstenden.jabberpoint.slide.item.SlideItem;
 import org.nhlstenden.jabberpoint.slide.item.TextItem;
 
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.util.Vector;
 
@@ -80,6 +83,37 @@ public class Slide implements BaseSlide {
         append(new TextItem(level, message));
     }
 
+    private StyleComponent createStyle(int level) {
+        // Create base style and decorate it
+        Style baseStyle;
+        switch (level) {
+            case 0: // Title style
+                baseStyle = new Style(0, Color.BLACK, 48, 20);
+                // Decorate with color and font size
+                return new ColorStyleDecorator(
+                    new FontSizeStyleDecorator(baseStyle, 60),
+                    Color.GREEN
+                );
+            case 1: // Main point style
+                baseStyle = new Style(20, Color.BLACK, 36, 10);
+                return new ColorStyleDecorator(baseStyle, Color.RED);
+            case 2: // Sub point style
+                baseStyle = new Style(40, Color.BLACK, 30, 10);
+                return new ColorStyleDecorator(baseStyle, Color.BLUE);
+            case 3: // Sub-sub point style
+                baseStyle = new Style(60, Color.BLACK, 24, 10);
+                return baseStyle; // No decoration
+            case 4: // Sub-sub-sub point style
+                baseStyle = new Style(100, Color.ORANGE, 5, 20);
+                return baseStyle;
+            case 5: // Sub-sub-sub-sub point style
+                baseStyle = new Style(120, Color.PINK, 1, 20);
+                return baseStyle;
+            default: // Default style
+                return new Style(60, Color.BLACK, 20, 10);
+        }
+    }
+
     // draw the slide
     @Override
     public void draw(Graphics graphics, Rectangle rectangle, ImageObserver imageObserver) {
@@ -87,12 +121,13 @@ public class Slide implements BaseSlide {
         int y = rectangle.y;
         // Title is handled separately
         SlideItem slideItem = new TextItem(0, this.getTitle());
-        Style style = Style.getStyle(slideItem.getLevel());
+        StyleComponent style = Style.getStyle(slideItem.getLevel());
         slideItem.draw(rectangle.x, y, scale, graphics, style, imageObserver);
         y += slideItem.getBoundingBox(graphics, imageObserver, scale, style).height;
+
         for (int number = 0; number< getNumberOfItems(); number++) {
             slideItem = getSlideItems().elementAt(number);
-            style = Style.getStyle(slideItem.getLevel());
+            style = createStyle(slideItem.getLevel());
             slideItem.draw(rectangle.x, y, scale, graphics, style, imageObserver);
             y += slideItem.getBoundingBox(graphics, imageObserver, scale, style).height;
         }

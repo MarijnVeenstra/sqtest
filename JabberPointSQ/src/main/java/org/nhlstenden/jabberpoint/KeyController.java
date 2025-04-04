@@ -1,7 +1,14 @@
 package org.nhlstenden.jabberpoint;
 
+import org.nhlstenden.jabberpoint.command.Command;
+import org.nhlstenden.jabberpoint.command.Exit;
+import org.nhlstenden.jabberpoint.command.Next;
+import org.nhlstenden.jabberpoint.command.Previous;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is the org.nhlstenden.jabberpoint.KeyController (KeyListener)
@@ -16,31 +23,28 @@ import java.awt.event.KeyEvent;
  */
 
 public class KeyController extends KeyAdapter {
-    private Presentation presentation; // Commands are given to the presentation
+    private final Map<Integer, Command> commandMap = new HashMap<>();
 
-    public KeyController(Presentation p) {
-        presentation = p;
+    public KeyController(Presentation presentation) {
+        // Map keys to command instances
+        commandMap.put(KeyEvent.VK_PAGE_DOWN, new Next(presentation));
+        commandMap.put(KeyEvent.VK_DOWN, new Next(presentation));
+        commandMap.put(KeyEvent.VK_ENTER, new Next(presentation));
+        commandMap.put((int) '+', new Next(presentation));
+
+        commandMap.put(KeyEvent.VK_PAGE_UP, new Previous(presentation));
+        commandMap.put(KeyEvent.VK_UP, new Previous(presentation));
+        commandMap.put((int) '-', new Previous(presentation));
+
+        commandMap.put((int) 'q', new Exit(presentation));
+        commandMap.put((int) 'Q', new Exit(presentation));
     }
 
+    @Override
     public void keyPressed(KeyEvent keyEvent) {
-        switch(keyEvent.getKeyCode()) {
-            case KeyEvent.VK_PAGE_DOWN:
-            case KeyEvent.VK_DOWN:
-            case KeyEvent.VK_ENTER:
-            case '+':
-                presentation.nextSlide();
-                break;
-            case KeyEvent.VK_PAGE_UP:
-            case KeyEvent.VK_UP:
-            case '-':
-                presentation.prevSlide();
-                break;
-            case 'q':
-            case 'Q':
-                System.exit(0);
-                break; // Probably never reached!!
-            default:
-                break;
+        Command command = commandMap.get(keyEvent.getKeyCode());
+        if (command != null) {
+            command.execute();
         }
     }
 }

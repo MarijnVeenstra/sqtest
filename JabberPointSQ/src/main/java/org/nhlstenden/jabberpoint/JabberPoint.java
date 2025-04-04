@@ -1,12 +1,15 @@
 package org.nhlstenden.jabberpoint;
 
+import org.nhlstenden.jabberpoint.decorator.StyleComponent;
+import org.nhlstenden.jabberpoint.decorator.Style;
+import org.nhlstenden.jabberpoint.decorator.FontSizeStyleDecorator;
+import org.nhlstenden.jabberpoint.decorator.ColorStyleDecorator;
+import org.nhlstenden.jabberpoint.slide.SlideViewerFrame;
 import org.nhlstenden.jabberpoint.accessor.Accessor;
 import org.nhlstenden.jabberpoint.accessor.XMLAccessor;
-import org.nhlstenden.jabberpoint.slide.SlideViewerFrame;
-import org.nhlstenden.jabberpoint.slide.Style;
 
 import javax.swing.JOptionPane;
-
+import java.awt.Color;
 import java.io.IOException;
 
 /** JabberPoint Main Programma
@@ -30,8 +33,15 @@ public class  JabberPoint {
 
     /** Het Main Programma */
     public static void main(String argv[]) {
-
-        Style.createStyles();
+        // Simple example of decorator pattern usage
+        Style baseStyle = new Style(20, Color.BLACK, 36, 10);
+        StyleComponent decoratedStyle = new FontSizeStyleDecorator(
+            new ColorStyleDecorator(baseStyle, Color.GREEN),
+            48
+        );
+        // The decorated style will have green color and larger font size
+        decoratedStyle.createStyles();
+        
         Presentation presentation = new Presentation();
         new SlideViewerFrame(JABVERSION, presentation);
         try {
